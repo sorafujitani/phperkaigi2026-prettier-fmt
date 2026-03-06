@@ -1,0 +1,381 @@
+/* ===================================
+   Slidev共通テンプレート - スタイル定義
+   =================================== */
+
+/* カラー変数定義（oklch color space使用） */
+:root {
+  /* Primary colors - Purple to Blue gradient */
+  --color-primary: oklch(0.6 0.2 270);
+  --color-secondary: oklch(0.65 0.2 240);
+  --color-accent: oklch(0.7 0.18 210);
+
+  /* Text colors */
+  --color-text: oklch(0.2 0.02 270);
+  --color-text-muted: oklch(0.5 0.05 270);
+
+  /* Background */
+  --color-bg: oklch(0.98 0.01 270);
+  --color-bg-soft: oklch(0.95 0.02 270);
+}
+
+.dark {
+  /* Dark mode colors */
+  --color-text: oklch(0.9 0.02 270);
+  --color-text-muted: oklch(0.6 0.05 270);
+  --color-bg: oklch(0.15 0.02 270);
+  --color-bg-soft: oklch(0.2 0.03 270);
+}
+
+/* フォント設定 */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP',
+               'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: "liga", "calt";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全スライド共通の背景 */
+#slideshow,
+.slidev-page {
+  background:
+    radial-gradient(ellipse 150% 40% at 50% 0%, oklch(0.5 0.15 220 / 0.35) 0%, oklch(0.5 0.15 220 / 0.1) 40%, transparent 70%),
+    linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-soft) 100%) !important;
+}
+
+/* レイアウト設定 */
+.slidev-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 7% 3%; /* 参考スライドの標準: 垂直7%, 水平3% */
+}
+
+/* 見出しスタイル */
+h1 {
+  font-size: clamp(1.3rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+h2 {
+  font-size: clamp(1.1rem, 2.8vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+h3 {
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+/* グラデーション見出し */
+.gradient-heading {
+  background: linear-gradient(135deg,
+    oklch(0.58 0.2 250) 0%,
+    oklch(0.63 0.18 230) 50%,
+    oklch(0.68 0.16 215) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 曲線アンダーライン */
+.curved-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.curved-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.2em;
+  width: 100%;
+  height: 0.15em;
+  background: var(--color-primary);
+  border-radius: 50%;
+  transform: scaleY(0.3);
+}
+
+/* テキストスタイル */
+p {
+  color: var(--color-text);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+}
+
+/* リストスタイル */
+li {
+  color: var(--color-text);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+  font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+}
+
+ul, ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 引用スタイル */
+blockquote {
+  font-style: italic;
+  border-left: 4px solid var(--color-primary);
+  padding-left: 1.5rem;
+  margin: 1.5em 0;
+  color: var(--color-text-muted);
+  background: color-mix(in oklch, var(--color-primary) 5%, transparent);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+}
+
+/* コードブロック */
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  background: oklch(0.9 0.03 200 / 0.15);
+  color: oklch(0.45 0.15 195);
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* Shiki コードブロックの背景調整 */
+.shiki {
+  background: oklch(0.08 0.015 200) !important;
+  padding: 1.5rem !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px oklch(0 0 0 / 0.2);
+}
+
+.dark .shiki {
+  background: oklch(0.06 0.015 200) !important;
+}
+
+/* Diff ブロックのカラーリング */
+.diff-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.diff-block pre:first-of-type .shiki {
+  background: linear-gradient(
+    to right,
+    rgba(255, 50, 50, 0.15),
+    rgba(255, 50, 50, 0.05)
+  ) !important;
+  border-left: 3px solid #ff5050 !important;
+}
+
+.diff-block pre:last-of-type .shiki {
+  background: linear-gradient(
+    to right,
+    rgba(50, 255, 50, 0.15),
+    rgba(50, 255, 50, 0.05)
+  ) !important;
+  border-left: 3px solid #50ff50 !important;
+}
+
+/* シンタックスハイライトのカスタマイズ - 水色系 */
+.shiki,
+.shiki span {
+  color: #ffffff !important;
+}
+
+.shiki span[style*="color:#A3BE8C"],
+.shiki span[style*="color:#8FBCBB"],
+.shiki span[style*="color:#88C0D0"],
+.shiki span[style*="color:#EBCB8B"],
+.shiki span[style*="color:#A3BE8C"] {
+  color: #5fd7ff !important;
+}
+
+.shiki span[style*="color:#81A1C1"] {
+  color: #00bfff !important;
+}
+
+.shiki span[style*="color:#8FBCBB"] {
+  color: #0087af !important;
+}
+
+.shiki span[style*="color:#616E88"],
+.shiki span[style*="color:#4C566A"] {
+  color: #5f8787 !important;
+  font-style: italic;
+}
+
+.shiki span[style*="color:#D8DEE9"],
+.shiki span[style*="color:#E5E9F0"],
+.shiki span[style*="color:#ECEFF4"] {
+  color: #87ffff !important;
+}
+
+.shiki span[style*="color:#88C0D0"],
+.shiki span[style*="color:#5E81AC"],
+.shiki span[style*="color:#BF616A"],
+.shiki span[style*="color:#D08770"],
+.shiki span[style*="color:#EBCB8B"] {
+  color: #00ffff !important;
+  font-weight: 600;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.5);
+}
+
+.shiki span[style*="color:#B48EAD"] {
+  color: #00d7d7 !important;
+}
+
+.shiki span[style*="color:#D8DEE9E5"],
+.shiki span[style*="color:#81A1C1"] {
+  color: #ffffff !important;
+}
+
+[data-theme="nord"] .shiki {
+  background: #0d1117 !important;
+}
+
+[data-theme="nord"] .shiki code {
+  color: #ffffff !important;
+}
+
+.shiki .line-number {
+  color: #5f8787 !important;
+  opacity: 0.7;
+}
+
+/* v-click要素 */
+.slidev-vclick-target {
+  transition: all 0.3s ease;
+}
+
+/* 画像スタイル */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* View Transition サポート */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.5s;
+  }
+}
+
+/* Emoji統合サポート */
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+/* アニメーション付きテキストシャドウ */
+.animated-shadow {
+  animation: text-shadow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes text-shadow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 10px color-mix(in oklch, var(--color-primary) 30%, transparent);
+  }
+  50% {
+    text-shadow: 0 0 20px color-mix(in oklch, var(--color-primary) 50%, transparent);
+  }
+}
+
+/* ===================================
+   参考スライド準拠の追加機能
+   =================================== */
+
+/* スライド全体のborder-radius */
+.slidev-page {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* カラムレイアウト - 水平方向 */
+.columns_h {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 1rem;
+}
+
+/* カラムレイアウト - 垂直方向 */
+.columns_v {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 1rem;
+}
+
+/* 配置ユーティリティ */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+}
+
+.left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+}
+
+/* Text Shine エフェクト */
+.text-shine {
+  background: linear-gradient(
+    90deg,
+    oklch(0.65 0.25 270) 0%,
+    oklch(0.75 0.2 210) 50%,
+    oklch(0.65 0.25 270) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shine 3s linear infinite;
+}
+
+@keyframes text-shine {
+  to {
+    background-position: 200% center;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "serena": {
+      "disabled": false,
+      "autoApprove": [
+        "list_dir",
+        "find_file",
+        "search_for_pattern",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "read_memory",
+        "list_memories",
+        "get_current_config",
+        "check_onboarding_performed",
+        "think_about_collected_information",
+        "think_about_task_adherence",
+        "think_about_whether_you_are_done",
+        "initial_instructions"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "bunx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}
