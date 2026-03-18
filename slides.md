@@ -2,7 +2,7 @@
 theme: default
 title: prettier/plugin-phpの仕組みと、PHP code format
 info: |
-PHPerKaigi 2026 / fujitani sora / 登壇資料
+  PHPerKaigi 2026 / fujitani sora / 登壇資料
 class: text-center
 colorSchema: dark
 drawings:
