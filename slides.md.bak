@@ -1,0 +1,581 @@
+---
+theme: default
+title: Prettier はどうやって PHP コードを整形しているのか
+info: PHPerKaigi 2026
+class: text-center
+drawings:
+  persist: false
+transition: slide-left
+mdc: false
+---
+
+<CoverSlide
+  title="Prettier はどうやって PHP コードを整形しているのか"
+  subtitle="コードフォーマッターの内部を追いかける 20 分"
+  event="PHPerKaigi 2026"
+  author="fujitani sora"
+  :social="{ github: 'fs0414', twitter: '_fs0414' }"
+/>
+
+---
+
+# 自己紹介
+
+- **fujitani sora** / @\_fs0414
+- 🏢 株式会社トリドリ
+- 🎤 TSKaigiの運営
+- 💻 技育CAMPメンター
+
+---
+
+# 今日やること
+
+- PHP コードを Prettier に渡すと整形されて返ってくる
+- **その間に何が起きているのか**を追いかける
+- まず全体像を見せて、そのあと具体的な PHP コードで各段階を追っていく
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">まずは見てみる: before → after</span>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# 整形前後のコード
+
+- 「誰が書いても、何回実行しても、同じ結果になる」
+
+  </template>
+  <template #right>
+
+```php
+// before: スペースも改行もバラバラ
+function  greet( $name,   $greeting="Hello" ){
+echo   $greeting . ", " .  $name;
+}
+
+// after
+function greet($name, $greeting = "Hello")
+{
+    echo $greeting . ", " . $name;
+}
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# 行幅で出力が変わる
+
+- 中身の長さに応じて自動で判断される
+- **この仕組みはどうなっているのか?**
+
+  </template>
+  <template #right>
+
+```php
+// 短い → 1行
+[$a, $b, $c]
+
+// 長い → 自動で改行+末尾カンマ
+[
+    $longName1,
+    $longName2,
+    $longName3,
+]
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">変換パイプライン</span>
+
+PHP コードはどんな姿を経て整形されるか
+
+---
+
+# Prettier のアプローチ
+
+## 全部捨ててゼロから作る
+
+- 元のスペースや改行を**全部捨てて**、コードの構造だけ理解して、ゼロから出力し直す
+- 元の書き方は一切見ない → **誰が書いても同じ結果**
+- 全てのフォーマッターがこうしているわけではなく、Prettier の設計上の選択
+- この「全部捨てて作り直す」ために、**3 段階の変換パイプライン**を持っている
+
+---
+
+# 3 段階の変換パイプライン
+
+```
+① PHP テキスト (文字列)
+     │  パース
+     ▼
+② AST (木構造: コードの構造を表すデータ)
+     │  出力構造の構築
+     ▼
+③ 中間表現 (「行幅に収まれば1行、収まらなければ改行」という選択肢を含むデータ)
+     │  行幅に基づくレイアウト確定
+     ▼
+④ フォーマット済み PHP テキスト (文字列)
+```
+
+---
+
+# 各段階で何が起きるか
+
+| 変換 | 処理 | ポイント |
+|------|------|----------|
+| ①→② パース | テキストを木構造に変換 | **スペースや改行が全て消える** |
+| ②→③ 出力構造の構築 | 各ノードを「どう出力するか」に変換 | **改行するかはまだ決めない** |
+| ③→④ レイアウト確定 | 行幅 (printWidth) に応じて最終テキストにする | **ここで改行位置が確定** |
+
+---
+
+# なぜ②から④に直接行かないのか
+
+- さっきの配列の例: 「1行に収まるか」は中身の長さ次第
+- ネストがあると、内側の改行が外側にも影響する
+- **「出力の構造を宣言する」と「改行するか判断する」を分離**するために中間表現を挟んでいる
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">この変換を誰がやるのか</span>
+
+Prettier のアーキテクチャ
+
+---
+
+# Prettier 本体は言語を知らない
+
+- コアは**言語非依存の汎用エンジン**
+- コアがやるのは「中間表現 → テキスト」(③→④) だけ
+- 言語ごとの処理は全て**プラグイン**に任せている
+- JS / CSS / HTML も、内部的にはプラグインとして実装されている
+
+---
+
+# プラグインが提供する 2 つの部品
+
+| 部品 | 役割 |
+|------|------|
+| **parser** | テキスト → AST (①→②) |
+| **printer** | AST → 中間表現 (②→③) |
+
+この 2 つを提供すれば、あとは Prettier 本体がやってくれる
+
+---
+
+# 拡張子とプラグインの紐づけ
+
+- プラグインは `languages` をエクスポートし、`extensions: [".php"]` を含む
+- Prettier はファイル拡張子を見て一致するプラグインを探す
+- GitHub の linguist プロジェクトの拡張子データがベース
+
+---
+
+# PHP の場合: plugin-php
+
+- `@prettier/plugin-php` が parser と printer を提供
+- parser は `php-parser` (npm) で PHP テキストを AST に変換
+- printer は AST の各ノードを中間表現に変換
+
+---
+
+# パイプライン図: 誰がどこを担うか
+
+```
+① PHP テキスト
+     │  plugin-php の parser     ← plugin-php
+     ▼
+② AST
+     │  plugin-php の printer    ← plugin-php
+     ▼
+③ 中間表現
+     │  prettier 本体            ← コア
+     ▼
+④ フォーマット済みテキスト
+```
+
+---
+
+# PHP 固有のデフォルト値とオプション
+
+| オプション | 説明 |
+|-----------|------|
+| tabWidth: 4 | prettier のデフォルト 2 を PHP では 4 に上書き |
+| phpVersion | composer.json から自動検出 |
+| braceStyle | 波括弧の位置 (per-cs / 1tbs) |
+| trailingCommaPHP | 複数行の末尾カンマ |
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">ここからは各段階で具体的に何が起きるか見ていきます</span>
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">第1段階: テキスト → AST</span>
+
+パース
+
+---
+
+# PHP バージョンの解決が最初に走る
+
+- `phpVersion: "auto"` → composer.json の `require.php` から読む
+- なければ最新版 (8.4)
+- このバージョンがフォーマット結果に影響する（後で出てくる）
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# パース結果の AST
+
+- 「PHP コードの構造がそのまま木になっている」
+
+  </template>
+  <template #right>
+
+```
+function greet($name) { echo $name; }
+
+        ↓ パース
+
+program
+└── function (name: "greet")
+    ├── arguments[0]: parameter (name: "$name")
+    └── body: block
+        └── echo → variable ($name)
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+# 何が消えて何が残るか
+
+| 消えたもの | 残ったもの |
+|-----------|-----------|
+| スペースの量 | 変数名 |
+| 改行位置 | 構造（親子関係） |
+| 波括弧が同じ行か次の行か | コメント |
+
+**「スペースが全部消えるから、ゼロから作り直せる」**
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">第2段階: AST → 中間表現</span>
+
+出力構造の構築
+
+---
+
+# 何をする段階か
+
+- AST の各ノードに対して「どう出力するか」を宣言する
+- ただし「改行するか」はまだ決めない
+- **「改行してもいい場所」だけ記録する**
+
+---
+
+# 「1行か改行か」を表現する 3 つの道具
+
+| 道具 | 役割 |
+|------|------|
+| **group** | 行幅に収まれば 1 行、収まらなければ改行 |
+| **line** | 1 行なら → スペース、改行なら → 改行+インデント |
+| **indent** | 改行時にインデントを 1 段深くする |
+
+この 3 つの組み合わせでほぼ全てのレイアウトを表現する
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# 配列の例
+
+- 短ければ1行、長ければ改行
+- printer は group で囲むだけ
+- **行幅の判定はしない**
+
+  </template>
+  <template #right>
+
+```php
+// 短い → 1行
+[$a, $b]
+
+// 長い → 改行+インデント+末尾カンマ
+[
+    $longVariableName1,
+    $longVariableName2,
+    $longVariableName3,
+]
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# 関数引数: 同じ仕組み
+
+- 配列と同じ仕組みで動いている
+
+  </template>
+  <template #right>
+
+```php
+// 短い → 1行
+foo($a, $b)
+
+// 長い → 改行+インデント+末尾カンマ
+foo(
+    $longArgument1,
+    $longArgument2,
+    $longArgument3,
+)
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# if 文の条件
+
+- 条件部分が独立した group
+- ここだけ独立して判断される
+- 本体は常に改行+インデント
+
+  </template>
+  <template #right>
+
+```php
+// 条件が短い
+if ($x) {
+
+// 条件が長い → 条件部分だけ改行
+if (
+    $longCondition1 &&
+    $longCondition2
+) {
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+# 波括弧の位置: 設定で切り替わる
+
+| 設定 | 結果 |
+|------|------|
+| per-cs（デフォルト） | 波括弧の前に改行 |
+| 1tbs | 波括弧の前にスペース |
+
+- 行幅の判断ではなく、設定に基づいて**中間表現の時点で確定**している
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">第3段階: 中間表現 → テキスト</span>
+
+レイアウト確定
+
+---
+
+# ここは prettier 本体の仕事
+
+- plugin-php は関与しない
+- group ごとに「行幅に収まるか」を判定
+  - 収まる → 1 行（line → スペース）
+  - 収まらない → 改行（line → 改行+インデント）
+
+---
+
+# ネストした group は独立して判断される
+
+- 外側が改行しても、内側が短ければ内側は 1 行のまま
+- だから**「ちょうどいい改行位置」が自動的に見つかる**
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">全部つなげて見る</span>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# 入力と出力
+
+  </template>
+  <template #right>
+
+```php
+// 入力
+function  greet( $name,   $greeting="Hello" ){
+echo   $greeting . ", " .  $name;
+}
+
+// 出力
+function greet($name, $greeting = "Hello")
+{
+    echo $greeting . ", " . $name;
+}
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+# 各段階を振り返る
+
+1. `.php` → plugin-php を発見
+2. パース → スペースが消えて木構造に
+3. 出力構造の構築 → 各ノードが「こう出力して」を宣言
+4. 行幅で確定 → 今回は収まったので 1 行
+
+---
+
+# 引数がもっと長かったら?
+
+- 同じ中間表現でも、中身の長さ次第で改行される
+- **「printer が宣言した構造を、prettier 本体が行幅に応じて確定する」**
+- これが Prettier の仕組み
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">コメントの配置</span>
+
+---
+
+# コメントの配置
+
+- パースと出力構造の構築の間にもう 1 つの処理がある
+- コメントは AST とは別の配列にいる
+- 「どのノードに所属するか」を決める処理がある
+- prettier 本体が大まかに判定、plugin-php が PHP 固有のケースを補正
+
+---
+
+# leading / trailing / dangling
+
+- フォーマッターで一番泥臭い部分
+- PHP 固有の特殊ケースが **30 以上**
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">PHP ならではの話</span>
+
+---
+
+<TwoColumnLayout>
+  <template #left>
+
+# trailing comma
+
+- 改行したときだけカンマが増える
+- PHP バージョンで制限あり
+  - 関数引数は 7.3+
+
+  </template>
+  <template #right>
+
+```php
+// 1行 → カンマなし
+foo($a, $b)
+
+// 改行 → 末尾にカンマ
+foo(
+    $a,
+    $b,
+)
+```
+
+  </template>
+</TwoColumnLayout>
+
+---
+
+# phpVersion で出力が変わる
+
+- PHP 8.4 で new 式の括弧が不要に
+
+```php
+// PHP < 8.4
+(new Foo())->method()
+
+// PHP >= 8.4
+new Foo()->method()
+```
+
+- composer.json から自動検出して切り替える
+
+---
+layout: center
+---
+
+# <span class="gradient-heading">まとめ</span>
+
+---
+
+# まとめ
+
+- <EmojiText emoji="🔧">Prettier 本体は言語を知らない汎用エンジン</EmojiText>
+- <EmojiText emoji="🐘">plugin-php が parser と printer を提供して PHP に対応</EmojiText>
+- <EmojiText emoji="🔄">パースでスペースを捨て → 出力構造を宣言 → 行幅で確定</EmojiText>
+- <EmojiText emoji="✂️">「何を出力するか」は plugin-php、「改行するか」は prettier 本体</EmojiText>
+
+---
+layout: center
+class: text-center
+---
+
+# <span class="gradient-heading">ご清聴ありがとうございました</span>
+
+<div class="mt-8">
+  <SocialLinks
+    github="fs0414"
+    twitter="_fs0414"
+  />
+</div>

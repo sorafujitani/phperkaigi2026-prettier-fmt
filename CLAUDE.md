@@ -1,12 +1,90 @@
-# Claude Code 作業ガイド - Slidev テンプレートプロジェクト
+# Claude Code 作業ガイド - PHPerKaigi 2026 スライドプロジェクト
 
 このドキュメントは、AI（Claude）がこのプロジェクトで作業する際の指針を定めたものです。
 
 ## 📋 プロジェクト概要
 
-- **プロジェクト名**: Slidev 共通テンプレート
+- **プロジェクト名**: 「Prettier はどうやって PHP コードを整形しているのか」 — PHPerKaigi 2026 登壇スライド (20分)
 - **主な技術**: Slidev, Vue.js, TypeScript, oklch color space
 - **デザインシステム**: `design_system/` ディレクトリに完全ドキュメント化
+- **スライド内容の原稿**: `note.md` — セクション構成・時間配分・説明テキストの原本
+- **題材ソースコード**: `/Users/fujitanisora/dev/oss/prettier-repo/` に prettier 本体と plugin-php の実装がある
+
+### スライドのセクション構成 (20分)
+
+| # | セクション | 時間 |
+|---|-----------|------|
+| 1 | Prettier とは | 2分 |
+| 2 | コードフォーマッターの仕組み (AST・loc・パイプライン・役割分担) | 6分 |
+| 3 | プラグインシステム (名前解決・設定マージ) | 3分 |
+| 4 | 行幅に応じたフォーマット | 3分 |
+| 5 | PHP ならではの事情 | 4分 |
+| 6 | まとめ | 2分 |
+
+---
+
+## 🔗 prettier-repo 実装コードの参照ガイド
+
+スライドの内容に正確性を持たせるため、実装の裏付けが必要な場合は以下のファイルを参照する。
+
+**リポジトリ**: `/Users/fujitanisora/dev/oss/prettier-repo/`
+
+### ディレクトリ構造
+
+```
+prettier-repo/
+├── prettier/          # Prettier 本体
+│   └── src/
+│       ├── main/          # フォーマット実行のコア
+│       ├── document/      # Doc IR (中間表現) システム
+│       ├── language-js/   # JS 言語実装 (プラグインの参考)
+│       ├── common/        # 共通ユーティリティ
+│       └── utilities/     # ヘルパー関数群
+└── plugin-php/        # @prettier/plugin-php
+    └── src/
+        ├── index.mjs      # プラグインエントリーポイント
+        ├── parser.mjs     # PHP パーサーラッパー
+        ├── printer.mjs    # PHP プリンター (最大ファイル)
+        ├── comments.mjs   # コメント配置ロジック
+        └── options.mjs    # PHP 固有オプション
+```
+
+### スライドのトピック別 参照ファイルマップ
+
+| スライドのトピック | 参照すべきファイル | 見るべきポイント |
+|------------------|-------------------|----------------|
+| **変換パイプライン全体** | `prettier/src/main/core.js` | `coreFormat()` — parse → print → layout の流れ |
+| **パース (テキスト→AST)** | `prettier/src/main/parse.js` | パーサー解決と呼び出し |
+| | `plugin-php/src/parser.mjs` | PHP パーサーの実装 |
+| **プリント (AST→Doc)** | `prettier/src/main/ast-to-doc.js` | `printAstToDoc()` — AST を Doc に変換 |
+| | `plugin-php/src/printer.mjs` | PHP ノード種別ごとの出力ロジック |
+| **Doc IR (中間表現)** | `prettier/src/document/builders/` | `group`, `indent`, `line`, `softline`, `ifBreak` 等のプリミティブ |
+| | `prettier/src/document/builders/group.js` | `group()` — 改行するかどうかの判断単位 |
+| | `prettier/src/document/builders/line.js` | `line`, `softline`, `hardline` の定義 |
+| **レイアウト (Doc→テキスト)** | `prettier/src/document/printer/printer.js` | `fits()` — 行幅に収まるかの判定アルゴリズム |
+| **プラグインシステム** | `prettier/src/main/parser-and-printer.js` | `resolveParser()`, `resolvePrinter()` — 名前による解決 |
+| | `prettier/src/main/plugins/load-plugins.js` | プラグインの読み込み |
+| | `plugin-php/src/index.mjs` | `languages`, `parsers`, `printers`, `options`, `defaultOptions` のエクスポート |
+| **設定マージ** | `prettier/src/main/normalize-format-options.js` | オプション正規化 |
+| **コメント配置** | `plugin-php/src/comments.mjs` | `handleOwnLineComment()`, `handleEndOfLineComment()` |
+| **PHP 固有オプション** | `plugin-php/src/options.mjs` | `braceStyle`, `phpVersion`, `trailingCommaPHP` 等 |
+| **括弧の挿入判定** | `plugin-php/src/needs-parens.mjs` | PHP 式の括弧が必要かどうかの判定 |
+| **Public API** | `prettier/src/index.js` | `format()`, `__debug.printToDoc()` 等 |
+
+### 参照時のルール
+
+**MUST（必須）**:
+1. スライドに「prettier/plugin-php はこう動く」と書く場合、該当ファイルで実装を確認する
+2. 関数名・変数名・構造を引用する場合は、実コードと一致させる
+3. 実装が変わっている可能性があるため、推測で書かず必ず Read して確認する
+
+**SHOULD（推奨）**:
+1. コードの具体例をスライドに入れたい場合、実装から抜粋または簡略化する
+2. 複雑なロジックを説明する場合、実コードの該当行を特定してから説明文を書く
+
+**MUST NOT（禁止）**:
+1. prettier-repo のコードを**変更**しない（読み取り専用として扱う）
+2. 実装を確認せずに内部構造の詳細を断定しない
 
 ---
 

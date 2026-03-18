@@ -23,11 +23,9 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
   <div class="cover-slide">
     <div class="cover-content">
-      <h1 v-if="!gradient" class="cover-title">
-        {{ title }}
+      <h1 v-if="!gradient" class="cover-title" v-html="title">
       </h1>
-      <GradientHeading v-else tag="h1" class="cover-title">
-        {{ title }}
+      <GradientHeading v-else tag="h1" class="cover-title" v-html="title">
       </GradientHeading>
 
       <div v-if="subtitle" class="mt-8 cover-subtitle">
@@ -73,8 +71,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 .cover-title {
   margin-bottom: 0;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(1.8rem, 4vw, 3rem) !important;
+  font-weight: 900;
   line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .cover-subtitle {
@@ -83,7 +84,8 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .cover-meta {
-  font-size: 0.875rem;
+  font-size: 1rem;
+  font-weight: 700;
   text-align: center;
   color: oklch(0.85 0.02 270);
 }
