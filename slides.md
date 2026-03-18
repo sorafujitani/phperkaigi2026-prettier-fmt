@@ -6,6 +6,8 @@ info: |
 class: text-center
 drawings:
   persist: false
+seoMeta:
+  ogImage: auto
 ---
 
 <CoverSlide
@@ -24,7 +26,7 @@ drawings:
     <div class="flex flex-col gap-3 text-lg font-semibold">
       <div class="flex items-center gap-2">
         <carbon-building class="text-lg" />
-        <span>toridori inc engineer</span>
+        <span>toridori Inc. engineer</span>
       </div>
       <div class="flex items-center gap-2">
         <carbon-events class="text-lg" />
@@ -203,7 +205,6 @@ $b = 2;
 { 
   kind: "expressionstatement",            // $b = 2;
   loc: { start: { offset: 9 },
-
          end:   { offset: 16 } } 
 }
 ```
