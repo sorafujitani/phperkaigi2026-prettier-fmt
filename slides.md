@@ -8,7 +8,9 @@ colorSchema: dark
 drawings:
   persist: false
 seoMeta:
-  ogImage: auto
+  ogImage: https://sorafujitani.github.io/phperkaigi2026-prettier-fmt/og-image.png
+  twitterCard: summary_large_image
+  twitterImage: https://sorafujitani.github.io/phperkaigi2026-prettier-fmt/og-image.png
 ---
 
 <CoverSlide
