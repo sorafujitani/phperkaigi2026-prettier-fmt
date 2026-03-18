@@ -2,7 +2,7 @@
 theme: default
 title: prettier/plugin-phpの仕組みと、PHP code format
 info: |
-  prettier と plugin-php を題材に、コードフォーマッターの仕組みを知る
+PHPerKaigi 2026 / fujitani sora / 登壇資料
 class: text-center
 colorSchema: dark
 drawings:
