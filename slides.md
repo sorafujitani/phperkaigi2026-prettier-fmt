@@ -4,6 +4,7 @@ title: prettier/plugin-phpの仕組みと、PHP code format
 info: |
   prettier と plugin-php を題材に、コードフォーマッターの仕組みを知る
 class: text-center
+colorSchema: dark
 drawings:
   persist: false
 seoMeta:
@@ -570,4 +571,4 @@ layout: center
 class: text-center
 ---
 
-<h1 class="text-white text-4xl font-bold">see you later 👋</h1>
+<h1 class="text-white text-4xl font-bold">See you later 👋</h1>
