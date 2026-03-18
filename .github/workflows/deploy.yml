@@ -33,7 +33,7 @@ jobs:
         run: bun install
 
       - name: Build Slidev
-        run: bun run build
+        run: bun run build -- --base /phperkaigi2026-prettier-fmt/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
