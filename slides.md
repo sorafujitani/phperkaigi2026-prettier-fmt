@@ -1,8 +1,7 @@
 ---
 theme: default
 title: prettier/plugin-phpの仕組みと、PHP code format
-info: |
-  PHPerKaigi 2026 / fujitani sora / 登壇資料
+info: "PHPerKaigi 2026 / fujitani sora / 登壇資料"
 class: text-center
 colorSchema: dark
 drawings:
@@ -124,6 +123,9 @@ layout: center
   <template #left>
 
 ```php
+/**
+ * phpdoc
+ */
 function greet($name) {
     echo $name;
 }
@@ -292,9 +294,9 @@ printWidth (行幅) に収まるかどうかで判断される
 
 
 ```php
-$x = [$a, $b, $c];          // 残り幅が十分 → 1行
+$x = [$a, $b, $c];                          // 残り幅が十分 → 1行
 
-$veryLongName = [$a, $b, $c];  // 残り幅が少ない → 改行するかも
+$userNotificationPreferences = [$a, $b, $c]; // 残り幅が少ない → 改行するかも
 ```
 
 ---
