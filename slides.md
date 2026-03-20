@@ -106,11 +106,6 @@ function greet($name, $greeting = "Hello")
 
 # 変換パイプライン
 
-```
-テキスト → AST → Doc (中間表現) → テキスト
-```
-<br />
-
 1. **Parse**: Input: source code, Output: AST
 2. **PrintAstToDoc**: Input: AST, Output: DocIR
 3. **PrintDocToString**: Input: DocIR, Output: Foamatterd String
