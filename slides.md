@@ -66,6 +66,14 @@ seoMeta:
 
 ---
 
+# Table of Contents
+
+1. Prettier
+2. Prettier plugin system
+3. PHP x Prettier
+
+---
+
 ```php
 function
 greet( $name,   $greeting="
@@ -84,14 +92,6 @@ function greet($name, $greeting = "Hello")
 ```
 
 </div>
-
----
-
-# Table of Contents
-
-1. Prettier
-2. Prettier plugin system
-3. PHP x Prettier
 
 ---
 
