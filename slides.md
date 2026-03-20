@@ -86,18 +86,20 @@ function greet($name, $greeting = "Hello")
 
 ---
 
-# Prettier とは
+# Table of Contents
 
-- 🔧 **コードフォーマッター**: コードの「意味」を変えずに「見た目」を統一するツール
+1. Prettier
+2. Prettier plugin system
+3. PHP x Prettier
+
+---
+
+# Prettier
+
+- **Code Formatter**: コードの「意味」を変えずに「見た目」を統一するツール
 - https://github.com/prettier
 - 🐘 `@prettier/plugin-php` で PHP にも対応
 - https://github.com/prettier/plugin-php
-
----
-layout: center
----
-
-# <span class="gradient-heading">Prettierの仕組み</span>
 
 ---
 
