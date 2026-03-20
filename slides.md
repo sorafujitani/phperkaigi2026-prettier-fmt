@@ -57,8 +57,9 @@ seoMeta:
   </div>
 </div>
 
-<div class="mt-6 text-sm text-gray-400">
-  ここに最近のTipsを記載
+<div class="mt-6 text-sm text-gray-100">
+  最近のTips<br />
+  神保町の喫茶「さぼうる」を溺愛している
 </div>
 
 </div>
