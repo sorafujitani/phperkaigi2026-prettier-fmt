@@ -562,3 +562,4 @@ class: text-center
 ---
 
 <h1 class="text-white text-4xl font-bold">See you later 👋</h1>
+<h2 class="text-white text-4xl font-bold">Enjoy PHPerKaigi 2026 !!</h2>
