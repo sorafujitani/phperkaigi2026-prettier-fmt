@@ -27,6 +27,10 @@ seoMeta:
     <p class="text-2xl font-bold mb-4" style="color: oklch(0.7 0.15 215)">fujitani sora</p>
     <div class="flex flex-col gap-3 text-lg font-semibold">
       <div class="flex items-center gap-2">
+        <carbon-calendar class="text-lg" />
+        <span>2001（24）</span>
+      </div>
+      <div class="flex items-center gap-2">
         <carbon-building class="text-lg" />
         <span>toridori Inc. engineer</span>
       </div>
